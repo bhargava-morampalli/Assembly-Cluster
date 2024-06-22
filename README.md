@@ -14,8 +14,10 @@
 
 ## Introduction
 
-This repo contains a standalone Python script ([`dereplicator.py`](dereplicator.py)) to solve a problem I occasionally run into: dereplicating a group of bacterial genome assemblies. Dereplication means removing assemblies for which there are sufficiently close relatives, resulting in a smaller set where the assemblies are more unique.
+This repo contains a standalone Python script ([`dereplicator.py`](dereplicator.py)) to solve a problem we ran into while analysing a large public genome dataset for carbapenemases. I occasionally run into: dereplicating a group of bacterial genome assemblies. Dereplication means removing assemblies for which there are sufficiently close relatives, resulting in a smaller set where the assemblies are more unique.
+I adapted the style of the script from Ryan Wick's Assembly-Dereplicator (https://github.com/rrwick/Assembly-Dereplicator) and tried to make it work very similar to his script. While his script compares assemblies and finally outputs representative genomes into an output folder, this Python script takes in as input, genome assemblies in a folder, runs an All vs All mash pariwise distance estimation across all genomes and applies a distance threshold to group the assemblies into clusters and outputs the results of genomes and the cluster they belong to as a tab separated text file.
 
+This is to solve the problem of identifying potential outbreaks of a particular bacterial strain (ST) across different countries. 
 As an example, imagine you have 10000 genome assemblies for a particular taxon and want to do some analysis on them, maybe building a pan genome. You know there is redundancy in this set because some of the genomes come from outbreaks and are nearly identical to each other. So instead of doing the analysis on all 10000 assemblies, you can dereplicate them to a smaller set (i.e. remove near-identical redundant genomes) so your analysis will be faster.
 
 
@@ -26,21 +28,20 @@ As an example, imagine you have 10000 genome assemblies for a particular taxon a
 To give you a visual idea of how this works, here are trees built from 1000 assemblies from the genus _Klebsiella_ dereplicated to various distance levels. You can see that in the no-dereplication and lower-distance trees, one clade dominates (corresponding to _K. pneumoniae_, the most sequenced species in the genus). The higher-distance trees are more balanced, and when dereplicated to a distance of 0.025, there is only one assembly per species/subspecies.
 
 
-
 ## Requirements
 
-You'll need [Python](https://www.python.org/) 3.8 or later to run `dereplicator.py`. It's a standalone script and has no Python package dependencies (i.e. it only uses the standard library).
-
-There is one external dependency, [Mash](https://github.com/marbl/Mash), which you'll need installed and callable on your command line. If you can run `mash sketch -h` and `mash dist -h` without getting an error, you should be good to go!
-
+I initially tried to use all libraries that are usually included in standard python libraries but in order to speed up the process of mash comparisons, then clustering based on distances and output as well as displaying a progress bar, I had to use some additional libraries.
+To make it easier to use, I have included a conda environment file (assemblycluster.yml), which you can use for creating an environment to run the script in. I have also included Mash itself in it - so it's essentially plug and play.
 
 
 ## Installation
 
-Since Assembly Dereplicator is a single script, no installation is required. You can simply clone it and run it:
+Since it is a single script, no installation is required. You can simply clone it, create conda environment using yml file, activate it and run:
 ```bash
-git clone https://github.com/rrwick/Assembly-dereplicator
-Assembly-dereplicator/dereplicator.py --help
+git clone https://github.com/bhargava-morampalli/Assembly-Cluster
+mamba env create -f assemblycluster.yml
+mamba activate assemblycluster
+Assembly-Cluster/assemblycluster.py --help
 ```
 
 If you plan on using it often, you can copy it to someplace in your PATH variable for easier access:
