@@ -14,7 +14,7 @@
 
 ## Introduction
 
-This repo contains a standalone Python script ([`dereplicator.py`](dereplicator.py)) to solve a problem we ran into while analysing a large public genome dataset for carbapenemases. I occasionally run into: dereplicating a group of bacterial genome assemblies. Dereplication means removing assemblies for which there are sufficiently close relatives, resulting in a smaller set where the assemblies are more unique.
+This repo contains a standalone Python script ([`assemblycluster.py`](assemblycluster.py)) to solve a problem we ran into while analysing a large public genome dataset for carbapenemases. I occasionally run into: dereplicating a group of bacterial genome assemblies. Dereplication means removing assemblies for which there are sufficiently close relatives, resulting in a smaller set where the assemblies are more unique.
 I adapted the style of the script from Ryan Wick's Assembly-Dereplicator (https://github.com/rrwick/Assembly-Dereplicator) and tried to make it work very similar to his script. While his script compares assemblies and finally outputs representative genomes into an output folder, this Python script takes in as input, genome assemblies in a folder, runs an All vs All mash pariwise distance estimation across all genomes and applies a distance threshold to group the assemblies into clusters and outputs the results of genomes and the cluster they belong to as a tab separated text file.
 
 This is to solve the problem of identifying potential outbreaks of a particular bacterial strain (ST) across different countries. 
