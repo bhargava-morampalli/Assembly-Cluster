@@ -117,7 +117,7 @@ def process_folder(folder, threshold, threads):
         logging.warning(f"No assemblies found in {folder}")
         return
 
-    logging.info(f"Processing {len(assemblies)} assemblies in {folder}")
+    logging.info(f"Found {len(assemblies)} assemblies in {folder}")
 
     with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as tmp:
         db_path = tmp.name
@@ -128,13 +128,13 @@ def process_folder(folder, threshold, threads):
 
     output_file = os.path.join(folder, f"{os.path.basename(folder)}_grouped.txt")
     write_groups_to_file(assemblies, clusters, output_file)
-    logging.info(f"Wrote assembly groupings to {output_file}")
+    logging.info(f"Wrote assembly clusters to {output_file}")
 
     os.unlink(db_path)
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="Group assemblies based on Mash distances",
+        description="Cluster assemblies based on Mash distances",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
