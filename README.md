@@ -15,17 +15,10 @@
 ## Introduction
 
 This repo contains a standalone Python script ([`assemblycluster.py`](assemblycluster.py)) to solve a problem we ran into while analysing a large public genome dataset for carbapenemases. I occasionally run into: dereplicating a group of bacterial genome assemblies. Dereplication means removing assemblies for which there are sufficiently close relatives, resulting in a smaller set where the assemblies are more unique.
+
 I adapted the style of the script from Ryan Wick's Assembly-Dereplicator (https://github.com/rrwick/Assembly-Dereplicator) and tried to make it work very similar to his script. While his script compares assemblies and finally outputs representative genomes into an output folder, this Python script takes in as input, genome assemblies in a folder, runs an All vs All mash pariwise distance estimation across all genomes and applies a distance threshold to group the assemblies into clusters and outputs the results of genomes and the cluster they belong to as a tab separated text file.
 
-This is to solve the problem of identifying potential outbreaks of a particular bacterial strain (ST) across different countries. 
-As an example, imagine you have 10000 genome assemblies for a particular taxon and want to do some analysis on them, maybe building a pan genome. You know there is redundancy in this set because some of the genomes come from outbreaks and are nearly identical to each other. So instead of doing the analysis on all 10000 assemblies, you can dereplicate them to a smaller set (i.e. remove near-identical redundant genomes) so your analysis will be faster.
-
-
-## Example
-
-<p align="center"><picture><source srcset="images/trees-dark.png" media="(prefers-color-scheme: dark)"><img src="images/trees.png" alt="Verticall trees" width="90%"></picture></p>
-
-To give you a visual idea of how this works, here are trees built from 1000 assemblies from the genus _Klebsiella_ dereplicated to various distance levels. You can see that in the no-dereplication and lower-distance trees, one clade dominates (corresponding to _K. pneumoniae_, the most sequenced species in the genus). The higher-distance trees are more balanced, and when dereplicated to a distance of 0.025, there is only one assembly per species/subspecies.
+This is to solve the problem of identifying potential outbreaks of a particular bacterial strain (ST) across different countries.
 
 
 ## Requirements
@@ -53,14 +46,7 @@ assemblycluster.py --help
 
 ## Method
 
-The basic dereplication process is to find the closest pair of assemblies in the set, discard the assembly in that pair with the lower N50 value and repeat until a stop condition is reached. By using N50 as a metric of assembly quality, complete assemblies are preferentially kept over draft assemblies.
-
-* pairwise distance, e.g. `--distance 0.001`. This will make dereplication continue until no two assemblies in the set have a Mash distance of less than the given value.
-
-If multiple criteria are used, then dereplication will continue until all are satisfied. E.g. `--distance 0.001 --count 100` will ensure that no two assemblies have a Mash distance of greater than 0.001 and there are no more than 100 assemblies.
-
-The process is deterministic, so running the script multiple times will give the same result. Also, running the script in multiple steps (e.g. first with `--distance 0.01` then again with `--distance 0.02`) will give the same result as running in a single step (e.g. using `--distance 0.02` the first time).
-
+The basic clustering process is to running an All vs All Mash pariwise distance estimation to calculate distances between all the assemblies. Then applying a distance threshold (default - `0.001`), assemblies that have distance estimation of less then 0.001 amongst all of them are grouped together. This means that only very closely related assemblies are grouped together when using the default distance threshold.
 
 
 ## Quick usage
