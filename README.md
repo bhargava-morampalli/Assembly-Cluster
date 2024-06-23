@@ -1,6 +1,6 @@
 # Assembly Cluster
 
-### NOTE: This script is put together quickly for my own project purposes - so very early version. Please let me know if anyone uses it and have ideas for additional functionalities. PRs welcome!
+##### NOTE: This script is put together quickly for my own project purposes - so very early version. Please let me know if anyone uses it and have ideas for additional functionalities. PRs welcome!
 
 ## Table of contents
 
