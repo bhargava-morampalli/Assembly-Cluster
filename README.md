@@ -32,12 +32,12 @@ To make it easier to use, I have included a conda environment file (`assemblyclu
 Since it is a single script, no installation is required. You can simply clone it, create conda environment using yml file, activate it and run:
 ```bash
 git clone https://github.com/bhargava-morampalli/Assembly-Cluster
-mamba env create -f assemblycluster.yml
+mamba env create -f Assembly-Cluster/assemblycluster.yml
 mamba activate assemblycluster
 Assembly-Cluster/assemblycluster.py --help
 ```
 
-If you plan on using it often, you can copy it to someplace in your PATH variable for easier access:
+If you plan on using it often, you can copy it to someplace in your PATH variable for easier access (you still need to remember to activate the conda environment):
 ```bash
 git clone https://github.com/bhargava-morampalli/Assembly-Cluster
 cp Assembly-Cluster/assemblycluster.py /usr/local/bin
