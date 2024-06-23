@@ -46,23 +46,16 @@ Assembly-Cluster/assemblycluster.py --help
 
 If you plan on using it often, you can copy it to someplace in your PATH variable for easier access:
 ```bash
-git clone https://github.com/rrwick/Assembly-dereplicator
-cp Assembly-dereplicator/dereplicator.py ~/.local/bin
-dereplicator.py --help
+git clone https://github.com/bhargava-morampalli/Assembly-Cluster
+cp Assembly-Cluster/assemblycluster.py /usr/local/bin
+assemblycluster.py --help
 ```
-
-If you'd like to double-check that everything works as intended, you can run this repo's [automated tests](test).
-
-
 
 ## Method
 
 The basic dereplication process is to find the closest pair of assemblies in the set, discard the assembly in that pair with the lower N50 value and repeat until a stop condition is reached. By using N50 as a metric of assembly quality, complete assemblies are preferentially kept over draft assemblies.
 
-There are three possible ways to specify how much to dereplicate:
-* A minimum pairwise distance, e.g. `--distance 0.001`. This will make dereplication continue until no two assemblies in the set have a Mash distance of less than the given value.
-* An assembly count, e.g. `--count 100`.  This will make dereplication continue until the target number of assemblies is reached.
-* An assembly fraction, e.g. `--fraction 0.5`.  This will make dereplication continue until the target fraction of assemblies is reached.
+* pairwise distance, e.g. `--distance 0.001`. This will make dereplication continue until no two assemblies in the set have a Mash distance of less than the given value.
 
 If multiple criteria are used, then dereplication will continue until all are satisfied. E.g. `--distance 0.001 --count 100` will ensure that no two assemblies have a Mash distance of greater than 0.001 and there are no more than 100 assemblies.
 
@@ -72,9 +65,11 @@ The process is deterministic, so running the script multiple times will give the
 
 ## Quick usage
 
-Assembly Dereplicator is easy to run. Just give it an input directory containing your assemblies in FASTA format, an output directory and a value for `--distance`, `--count` or `--fraction`:
+Assembly Cluster is easy to run. Just give it an input directory containing your assemblies in FASTA format or if it needs to be run for multiple sets of fasta files separately - a parent directory containing all the subdirectories that need to be processed, a value for `--threshold`, `--threads` as needed for specific cases.
+
 ```bash
-dereplicator.py --distance 0.01 assembly_dir output_dir
+assemblycluster.py input_dir
+assemblycluster.py input_dir --threshold 0.02 --threads 32
 ```
 
 
@@ -82,58 +77,48 @@ dereplicator.py --distance 0.01 assembly_dir output_dir
 ## Full usage
 
 ```
-usage: dereplicator.py [--distance DISTANCE] [--count COUNT] [--fraction FRACTION]
-                       [--sketch_size SKETCH_SIZE] [--threads THREADS] [--verbose] [-h]
-                       [--version]
-                       in_dir out_dir
+usage: assemblycluster.py [-h] [--threshold THRESHOLD] [--threads THREADS] input_dir
 
-Assembly Dereplicator
+Group assemblies based on Mash distances
 
-Positional arguments:
-  in_dir                     Directory containing all assemblies
-  out_dir                    Directory where dereplicated assemblies will be copied
+positional arguments:
+  input_dir             Directory containing assembly files or subdirectories
 
-Dereplication target:
-  --distance DISTANCE        Dereplicate until the closest pair has a Mash distance of this value
-                             or greater
-  --count COUNT              Dereplicate until there are no more than this many assemblies
-  --fraction FRACTION        Dereplicate until there are no more than this fraction of the
-                             original number of assemblies
+optional arguments:
+  -h, --help            show this help message and exit
+  --threshold THRESHOLD
+                        Mash distance threshold for grouping (default: 0.001)
+  --threads THREADS     Number of threads for parallel processing (default: 10)
 
-Settings:
-  --sketch_size SKETCH_SIZE  Mash assembly sketch size (default: 10000)
-  --threads THREADS          Number of CPU threads for Mash (default: 10)
-  --verbose                  Display more output information
+Examples:
+  Process a single folder of assemblies:
+    python script.py /path/to/assembly/folder
 
-Other:
-  -h, --help                 Show this help message and exit
-  --version                  Show program's version number and exit
+  Process a folder with multiple subdirectories containing assemblies:
+    python script.py /path/to/parent/folder
+
+  Specify a custom threshold and number of threads:
+    python script.py /path/to/folder --threshold 0.005 --threads 16
+
+Notes:
+  - The script automatically detects whether it's processing a single folder
+    or multiple subdirectories.
+  - Output files are named '<foldername>_grouped.txt' and placed in the
+    respective folders.
+  - The script scales well with increased threads, but performance gains may
+    plateau depending on I/O limitations and the number of CPU cores available.
 ```
 
 Positional arguments:
-* `in_dir`: directory containing input assemblies, will be searched recursively. The input assemblies must be in FASTA format and the script will find them in the input directory based on extension. Any of the following are acceptable: `.fasta`, `.fasta.gz`, `.fna`, `.fna.gz`, `.fa` and `.fa.gz`.
-* `out_dir`: directory where dereplicated assemblies (i.e. the representative assembly for each cluster) will be copied. If this directory doesn't exist, it will be created. Copied assemblies will have the same filename they had in the input directory.
+* `input_dir`: directory containing input assemblies or a parent directory that contains multiple subdirectories with a set of fasta files in each that needs se. The input assemblies must be in FASTA format and the script will find them in the input directory based on extension. Any of the following are acceptable: `.fasta`, `.fasta.gz`, `.fna`, `.fna.gz`, `.fa` and `.fa.gz`.
+* Output text file is always created in the `input_dir` which was supplied. If a parent directory is supplied, output text file is always created in the respective subfolders.
 
 Dereplication target:
-* `--distance`: the target minimum pairwise Mash distance between assemblies. Must be between 0 and 1. Mash distance roughly corresponds to one minus average nucleotide identity. Setting it to a small value (e.g. 0.001) will result in more dereplicated assemblies, i.e. only very close relatives will be excluded. Setting it to a large value (e.g. 0.02) will result in fewer dereplicated assemblies, perhaps just one per species.
-* `--count`: the target number of output assemblies. If this value is equal to or greater than the number of input assemblies, no dereplication will take place.
-* `--fraction`: the target fraction of output assemblies. Must be between 0 and 1.
-* At least one of `--distance`, `--count` or `--fraction` must be used. Multiple targets can be used (e.g. both `--distance` and `--count`), in which case dereplication will continue until all targets are met.
+* `--threshold`: the target minimum pairwise Mash distance between assemblies. Must be between 0 and 1. Default value is 0.001. Mash distance roughly corresponds to one minus average nucleotide identity. Setting it to a small value (e.g. 0.001) will result in large number of clusters, i.e. only very close relatives are grouped together. Setting it to a large value (e.g. 0.02) will result in fewer clusters.
+* Default value of 0.001 is assumed if no value is given as `--threshold`. If a different value is needed, `--threshold VALUE` needs to be given.
 
 Settings:
-* `--sketch_size`: controls the [Mash sketch size](https://mash.readthedocs.io/en/latest/sketches.html#sketch-size). A smaller value (e.g. 1000) will make the process faster but slightly less accurate.
-* `--threads`: controls how many threads Mash uses for its sketching and distances. Mash scales well in parallel, so use lots of threads if you have them!
-* `--verbose`: using this flag results in more information being printed to stdout.
-
-
-
-## Performance
-
-Since `dereplicator.py` uses pairwise distances, it scales with the square of the number of input assemblies, i.e. _O_(_n_<sup>2</sup>). This means that small numbers of input assemblies (e.g. <100) will be very fast, and large numbers (e.g. >10000) will take much longer. Mash parallelises well, so use as many threads as you can for large datasets.
-
-As a test, I ran `dereplicator.py` on all [_Klebsiella_ genomes in GTDB](https://gtdb.ecogenomic.org/tree?r=g__Klebsiella). At the time of writing, this was about 13700 assemblies, so about 188 million pairwise comparisons. Using 48 CPU threads, the process took about 40 minutes to complete and used about 35 GB of RAM.
-
-
+* `--threads`: controls how many threads Mash uses for its sketching and distances. Default is set to 10 (no need to mention it). If a different valye is needed, `--threads VALUE` needs to be given. All vs All Mash comparisons need lot of resources depending on the number of genomes/assemblies - so, use as many as you can spare.
 
 ## License
 
