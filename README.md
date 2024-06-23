@@ -31,7 +31,7 @@ To give you a visual idea of how this works, here are trees built from 1000 asse
 ## Requirements
 
 I initially tried to use all libraries that are usually included in standard python libraries but in order to speed up the process of mash comparisons, then clustering based on distances and output as well as displaying a progress bar, I had to use some additional libraries.
-To make it easier to use, I have included a conda environment file (assemblycluster.yml), which you can use for creating an environment to run the script in. I have also included Mash itself in it - so it's essentially plug and play.
+To make it easier to use, I have included a conda environment file (`assemblycluster.yml`), which you can use for creating an environment to run the script in. I have also included Mash itself in it - so it's essentially plug and play.
 
 
 ## Installation
@@ -113,7 +113,7 @@ Positional arguments:
 * `input_dir`: directory containing input assemblies or a parent directory that contains multiple subdirectories with a set of fasta files in each that needs se. The input assemblies must be in FASTA format and the script will find them in the input directory based on extension. Any of the following are acceptable: `.fasta`, `.fasta.gz`, `.fna`, `.fna.gz`, `.fa` and `.fa.gz`.
 * Output text file is always created in the `input_dir` which was supplied. If a parent directory is supplied, output text file is always created in the respective subfolders.
 
-Dereplication target:
+Cluster distance threshold:
 * `--threshold`: the target minimum pairwise Mash distance between assemblies. Must be between 0 and 1. Default value is 0.001. Mash distance roughly corresponds to one minus average nucleotide identity. Setting it to a small value (e.g. 0.001) will result in large number of clusters, i.e. only very close relatives are grouped together. Setting it to a large value (e.g. 0.02) will result in fewer clusters.
 * Default value of 0.001 is assumed if no value is given as `--threshold`. If a different value is needed, `--threshold VALUE` needs to be given.
 
